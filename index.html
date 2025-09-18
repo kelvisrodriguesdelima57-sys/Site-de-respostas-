@@ -1,34 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AtividadesFácil</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefas - Automação de Tarefas</title>
+    
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --eclipse-background-dark: #0A0A0A;
+            --eclipse-background-light: #151A20;
+            --eclipse-text-primary: #e5e5e5;
+            --eclipse-text-secondary: #A0A0B0;
+            --eclipse-border: #3A4555;
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: var(--eclipse-background-dark);
+            color: var(--eclipse-text-primary);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header.main-header {
+            background: var(--eclipse-background-light);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--eclipse-border);
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 700;
+            background: linear-gradient(90deg, #1E90FF, #00BFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            color: var(--eclipse-text-secondary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            color: var(--eclipse-text-secondary);
+        }
+
+        footer span.kel_mod {
+            color: #1E90FF; /* azul */
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-<section id="centralizar">
-  <div id="form">
-      <h1>AtividadesFácil</h1>
-          <form id="Enviar">
-                <input type="text" id="ra" placeholder="Ex: 00011198235xSP" required>
-                      <div class="Mostrar">
-                              <input type="password" id="senha" placeholder="Senha" required>
-                                      <button type="button" id="VerSenha">&#128269;</button>
-                                            </div>
-                                                  <button type="submit">Realizar atividades</button>
-                                                      </form>
-                                                        </div>
-                                                          <article id="TamanhoN"></article>
-                                                          </section>
 
-                                                          <script>
-                                                          let trava=false;
-                                                          document.getElementById('VerSenha').addEventListener('click',()=>{const s=document.getElementById('senha');s.type=s.type==='password'?'text':'password';});
-                                                          function Atividade(titulo,msg){const a=document.getElementById('TamanhoN');const b=document.createElement('div');b.classList.add('Notificacao');b.innerHTML=`<strong>${titulo}</strong><span>${msg}</span>`;a.appendChild(b);setTimeout(()=>{b.style.animation="sumir 1s forwards";setTimeout(()=>b.remove(),1000);},5000);}
-                                                          async function delay(ms){return new Promise(r=>setTimeout(r,ms));}
-                                                          async function enviarRespostas(task, auth_token){if(!task.questions) return;const answers={};task.questions.forEach(q=>{if(q.type==="info") return;if(q.options){Object.keys(q.options).forEach(k=>answers[q.id]={question_id:q.id,question_type:q.type,answer:{[k]:true}});}});const payload={status:"submitted",accessed_on:"room",executed_on:task.publication_target,answers};Atividade("AtividadesFácil",`⏳ Enviando tarefa: ${task.title}`);await delay(5000);await fetch(`https://edusp-api.ip.tv/tms/task/${task.id}/answer`,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":auth_token},body:JSON.stringify(payload)});Atividade("AtividadesFácil",`✅ Enviado: ${task.title}`);}
-                                                          document.getElementById("Enviar").addEventListener("submit",async e=>{e.preventDefault();if(trava){Atividade("AtividadesFácil","⏳ Já está rodando...");return;}trava=true;const user=document.getElementById("ra").value.trim();const senha=document.getElementById("senha").value.trim();try{Atividade("AtividadesFácil","🔄 Logando...");const login=await fetch("http://localhost:3000/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user,senha})}).then(r=>r.json());Atividade("AtividadesFácil","✅ Login OK");const salasRes=await fetch("http://localhost:3000/api/salas",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:login.token})}).then(r=>r.json());Atividade("AtividadesFácil",`📚 ${salasRes.salas.rooms?.length || 0} salas encontradas`);if(salasRes.salas.rooms.length>0){const room_name=salasRes.salas.rooms[0].name;const tasksRes=await fetch("http://localhost:3000/api/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({auth_token:salasRes.auth_token,room_name})}).then(r=>r.json());if(tasksRes.length===0){Atividade("AtividadesFácil","🚫 Nenhuma atividade disponível");}else{for(const task of tasksRes){await enviarRespostas(task,salasRes.auth_token);}}}trava=false;}catch(err){console.error(err);Atividade("AtividadesFácil","❌ Erro: "+err.message);trava=false;}});
-                                                          </script>
-                                                          </body>
-                                                          </html>
+    <!-- HEADER -->
+    <header class="main-header">
+        <h1>✅ Tarefas</h1>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container">
+        <p class="subtitle">Automação de Tarefas simplificada</p>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+        Desenvolvido por <span class="kel_mod">kel_mod</span>
+    </footer>
+
+</body>
+</html>

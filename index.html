@@ -17,6 +17,11 @@
             --eclipse-border: #3A4555;
             --font-heading: 'Orbitron', sans-serif;
             --font-body: 'Poppins', sans-serif;
+            --input-background: #1A2028;
+            --input-border: #3A4555;
+            --input-text: #e5e5e5;
+            --button-background: #1E90FF;
+            --button-hover: #00BFFF;
         }
 
         body {
@@ -48,16 +53,53 @@
 
         .container {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             flex: 1;
             text-align: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        input {
+            width: 250px;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background-color: var(--input-background);
+            color: var(--input-text);
+            font-size: 1rem;
+        }
+
+        input::placeholder {
+            color: var(--eclipse-text-secondary);
+        }
+
+        button {
+            width: 250px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--button-background), var(--button-hover));
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            opacity: 0.9;
         }
 
         .subtitle {
             font-family: var(--font-heading);
             font-size: 1.2rem;
             color: var(--eclipse-text-secondary);
+            margin-bottom: 15px;
         }
 
         footer {
@@ -69,7 +111,7 @@
         }
 
         footer span.kel_mod {
-            color: #1E90FF; /* azul */
+            color: #1E90FF;
             font-weight: 600;
         }
     </style>
@@ -84,6 +126,10 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="container">
         <p class="subtitle">Automação de Tarefas simplificada</p>
+
+        <input type="text" placeholder="Digite seu RA" id="ra">
+        <input type="password" placeholder="Digite sua senha" id="senha">
+        <button>Entrar</button>
     </main>
 
     <!-- RODAPÉ -->

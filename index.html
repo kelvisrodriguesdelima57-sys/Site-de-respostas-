@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AtividadesFácil</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<section id="centralizar">
+  <div id="form">
+      <h1>AtividadesFácil</h1>
+          <form id="Enviar">
+                <input type="text" id="ra" placeholder="Ex: 00011198235xSP" required>
+                      <div class="Mostrar">
+                              <input type="password" id="senha" placeholder="Senha" required>
+                                      <button type="button" id="VerSenha">&#128269;</button>
+                                            </div>
+                                                  <button type="submit">Realizar atividades</button>
+                                                      </form>
+                                                        </div>
+                                                          <article id="TamanhoN"></article>
+                                                          </section>
+
+                                                          <script>
+                                                          let trava=false;
+                                                          document.getElementById('VerSenha').addEventListener('click',()=>{const s=document.getElementById('senha');s.type=s.type==='password'?'text':'password';});
+                                                          function Atividade(titulo,msg){const a=document.getElementById('TamanhoN');const b=document.createElement('div');b.classList.add('Notificacao');b.innerHTML=`<strong>${titulo}</strong><span>${msg}</span>`;a.appendChild(b);setTimeout(()=>{b.style.animation="sumir 1s forwards";setTimeout(()=>b.remove(),1000);},5000);}
+                                                          async function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+                                                          async function enviarRespostas(task, auth_token){if(!task.questions) return;const answers={};task.questions.forEach(q=>{if(q.type==="info") return;if(q.options){Object.keys(q.options).forEach(k=>answers[q.id]={question_id:q.id,question_type:q.type,answer:{[k]:true}});}});const payload={status:"submitted",accessed_on:"room",executed_on:task.publication_target,answers};Atividade("AtividadesFácil",`⏳ Enviando tarefa: ${task.title}`);await delay(5000);await fetch(`https://edusp-api.ip.tv/tms/task/${task.id}/answer`,{method:"POST",headers:{"Content-Type":"application/json","x-api-key":auth_token},body:JSON.stringify(payload)});Atividade("AtividadesFácil",`✅ Enviado: ${task.title}`);}
+                                                          document.getElementById("Enviar").addEventListener("submit",async e=>{e.preventDefault();if(trava){Atividade("AtividadesFácil","⏳ Já está rodando...");return;}trava=true;const user=document.getElementById("ra").value.trim();const senha=document.getElementById("senha").value.trim();try{Atividade("AtividadesFácil","🔄 Logando...");const login=await fetch("http://localhost:3000/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user,senha})}).then(r=>r.json());Atividade("AtividadesFácil","✅ Login OK");const salasRes=await fetch("http://localhost:3000/api/salas",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:login.token})}).then(r=>r.json());Atividade("AtividadesFácil",`📚 ${salasRes.salas.rooms?.length || 0} salas encontradas`);if(salasRes.salas.rooms.length>0){const room_name=salasRes.salas.rooms[0].name;const tasksRes=await fetch("http://localhost:3000/api/tasks",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({auth_token:salasRes.auth_token,room_name})}).then(r=>r.json());if(tasksRes.length===0){Atividade("AtividadesFácil","🚫 Nenhuma atividade disponível");}else{for(const task of tasksRes){await enviarRespostas(task,salasRes.auth_token);}}}trava=false;}catch(err){console.error(err);Atividade("AtividadesFácil","❌ Erro: "+err.message);trava=false;}});
+                                                          </script>
+                                                          </body>
+                                                          </html>

@@ -1,162 +1,236 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tarefas - Automação de Tarefas</title>
-
-<!-- Fontes -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --eclipse-background-dark: #0A0A0A;
-    --eclipse-background-light: #151A20;
-    --eclipse-text-primary: #e5e5e5;
-    --eclipse-text-secondary: #A0A0B0;
-    --eclipse-border: #3A4555;
-    --font-heading: 'Orbitron', sans-serif;
-    --font-body: 'Poppins', sans-serif;
-    --input-background: #1A2028;
-    --input-border: #3A4555;
-    --input-text: #e5e5e5;
-    --button-background: #1E90FF;
-    --button-hover: #00BFFF;
-}
-
-body {
-    margin: 0;
-    font-family: var(--font-body);
-    background: var(--eclipse-background-dark);
-    color: var(--eclipse-text-primary);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-header.main-header {
-    background: var(--eclipse-background-light);
-    padding: 1rem;
-    text-align: center;
-    border-bottom: 1px solid var(--eclipse-border);
-}
-
-header h1 {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    margin: 0;
-    font-weight: 700;
-    background: linear-gradient(90deg, #1E90FF, #00BFFF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    text-align: center;
-    gap: 15px;
-    padding: 20px;
-}
-
-input {
-    width: 250px;
-    padding: 12px 15px;
-    margin: 8px 0;
-    border: 1px solid var(--input-border);
-    border-radius: 8px;
-    background-color: var(--input-background);
-    color: var(--input-text);
-    font-size: 1rem;
-}
-
-input::placeholder {
-    color: var(--eclipse-text-secondary);
-}
-
-button {
-    width: 250px;
-    padding: 12px 15px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 8px;
-    background: linear-gradient(90deg, var(--button-background), var(--button-hover));
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-button:hover {
-    opacity: 0.9;
-}
-
-.subtitle {
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    color: var(--eclipse-text-secondary);
-    margin-bottom: 15px;
-}
-
-footer {
-    text-align: center;
-    padding: 10px 0;
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    color: var(--eclipse-text-secondary);
-}
-
-footer span.kel_mod {
-    color: #1E90FF;
-    font-weight: 600;
-}
-
-/* RESPONSIVO */
-@media (max-width: 480px) {
-    header h1 {
-        font-size: 1.3rem;
-    }
-
-    .subtitle {
-        font-size: 1rem;
-    }
-
-    input, button {
-        width: 90%;
-        font-size: 0.95rem;
-    }
-
-    .container {
-        padding: 15px;
-        gap: 10px;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Taskitos API Front</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5fa; color: #222; padding: 30px;}
+        .container { max-width: 400px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 16px #0002; padding: 24px;}
+        .input-group { margin-bottom: 16px; }
+        label { font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 4px; margin-bottom: 4px; border: 1px solid #ccc; border-radius: 4px;}
+        button { padding: 10px 16px; border: none; background: #1E90FF; color: #fff; border-radius: 4px; font-weight: bold; cursor: pointer;}
+        button:hover { background: #0077CC;}
+        .hidden { display: none;}
+        .atividades { margin-top: 20px;}
+        .atividade-item { background: #f8f8fc; padding: 10px; border-radius: 4px; margin-bottom: 8px; }
+        .progresso { background: #e7f7ef; margin-top: 15px; padding: 10px; border-radius: 4px;}
+        .erro { color: #c00; margin-bottom: 10px;}
+        .sucesso { color: #080; margin-bottom: 10px;}
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h2>Taskitos (API Exemplo)</h2>
+        <div id="msg" class="erro hidden"></div>
+        <div id="msgOk" class="sucesso hidden"></div>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="ra">RA</label>
+                <input type="text" id="ra" required placeholder="RA + dígito + sp">
+            </div>
+            <div class="input-group">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha" required placeholder="Senha">
+            </div>
+            <button type="submit">Entrar</button>
+        </form>
+        <div id="areaAluno" class="hidden">
+            <h3>Bem-vindo, <span id="nomeAluno"></span>!</h3>
+            <button id="btnAtividades">Buscar Atividades/Provas</button>
+            <div id="atividades" class="atividades"></div>
+        </div>
+        <div id="areaRespostas" class="hidden">
+            <h3>Enviar Resposta</h3>
+            <form id="respostaForm">
+                <input type="hidden" id="atividadeId">
+                <div class="input-group">
+                    <label for="respostas">Respostas (simulação)</label>
+                    <input type="text" id="respostas" required value="A,B,C,D">
+                </div>
+                <div class="input-group">
+                    <label for="tempo">Tempo (min)</label>
+                    <input type="number" id="tempo" required value="5" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="pontuacao">Pontuação (%)</label>
+                    <select id="pontuacao">
+                        <option value="50">50%</option>
+                        <option value="75" selected>75%</option>
+                        <option value="85">85%</option>
+                        <option value="100">100%</option>
+                    </select>
+                </div>
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+        <div id="areaProgresso" class="hidden">
+            <h3>Progresso do Aluno</h3>
+            <button id="btnProgresso">Ver Progresso</button>
+            <div id="progresso" class="progresso"></div>
+        </div>
+    </div>
+    <script>
+        // Troque a URL se sua API estiver em outro lugar!
+        const API_URL = "http://localhost:3000";
 
-<!-- HEADER -->
-<header class="main-header">
-    <h1>✅ Tarefas</h1>
-</header>
+        // Elementos
+        const loginForm = document.getElementById('loginForm');
+        const areaAluno = document.getElementById('areaAluno');
+        const areaRespostas = document.getElementById('areaRespostas');
+        const areaProgresso = document.getElementById('areaProgresso');
+        const nomeAluno = document.getElementById('nomeAluno');
+        const btnAtividades = document.getElementById('btnAtividades');
+        const atividadesDiv = document.getElementById('atividades');
+        const respostaForm = document.getElementById('respostaForm');
+        const atividadeIdInput = document.getElementById('atividadeId');
+        const areaMsg = document.getElementById('msg');
+        const areaMsgOk = document.getElementById('msgOk');
+        const btnProgresso = document.getElementById('btnProgresso');
+        const progressoDiv = document.getElementById('progresso');
+        
+        let raAtual = "";
+        let senhaAtual = "";
 
-<!-- CONTEÚDO PRINCIPAL -->
-<main class="container">
-    <p class="subtitle">Automação de Tarefas simplificada</p>
+        function mostrarMsg(msg, ok = false) {
+            if (ok) {
+                areaMsg.classList.add('hidden');
+                areaMsgOk.classList.remove('hidden');
+                areaMsgOk.innerText = msg;
+            } else {
+                areaMsgOk.classList.add('hidden');
+                areaMsg.classList.remove('hidden');
+                areaMsg.innerText = msg;
+            }
+        }
+        function limparMsg() {
+            areaMsg.classList.add('hidden');
+            areaMsgOk.classList.add('hidden');
+        }
 
-    <input type="text" placeholder="Digite seu RA" id="ra">
-    <input type="password" placeholder="Digite sua senha" id="senha">
-    <button>Entrar</button>
-</main>
+        // LOGIN
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            limparMsg();
+            const ra = loginForm.ra.value.trim();
+            const senha = loginForm.senha.value.trim();
+            try {
+                const resp = await fetch(`${API_URL}/login`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ra, senha})
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    raAtual = ra;
+                    senhaAtual = senha;
+                    nomeAluno.innerText = data.nome;
+                    areaAluno.classList.remove('hidden');
+                    areaRespostas.classList.remove('hidden');
+                    areaProgresso.classList.remove('hidden');
+                    loginForm.classList.add('hidden');
+                } else {
+                    mostrarMsg(data.erro || "Falha ao entrar.");
+                }
+            } catch (err) {
+                mostrarMsg("Erro de conexão.");
+            }
+        });
 
-<!-- RODAPÉ -->
-<footer>
-    Desenvolvido por <span class="kel_mod">kel_mod</span>
-</footer>
+        // BUSCAR ATIVIDADES/PROVAS
+        btnAtividades.addEventListener('click', async function() {
+            limparMsg();
+            atividadesDiv.innerHTML = "Buscando...";
+            try {
+                const resp = await fetch(`${API_URL}/atividades`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ra: raAtual})
+                });
+                const lista = await resp.json();
+                if (lista.length === 0) {
+                    atividadesDiv.innerHTML = "<em>Nenhuma atividade/prova encontrada.</em>";
+                    return;
+                }
+                atividadesDiv.innerHTML = "";
+                lista.forEach(atv => {
+                    const div = document.createElement('div');
+                    div.className = "atividade-item";
+                    div.innerHTML = `
+                        <b>${atv.tipo === "prova" ? "Prova" : "Atividade"}:</b> ${atv.nome}<br>
+                        <b>Status:</b> ${atv.status}<br>
+                        <button onclick="selecionarAtividade(${atv.id})">Responder</button>
+                    `;
+                    atividadesDiv.appendChild(div);
+                });
+            } catch (err) {
+                atividadesDiv.innerHTML = "Erro ao buscar atividades.";
+            }
+        });
 
+        // Selecionar atividade para responder
+        window.selecionarAtividade = function(id) {
+            atividadeIdInput.value = id;
+            areaRespostas.scrollIntoView({behavior:'smooth'});
+        };
+
+        // ENVIAR RESPOSTAS
+        respostaForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            limparMsg();
+            const atividadeId = respostaForm.atividadeId.value;
+            const respostas = respostaForm.respostas.value;
+            const tempo = respostaForm.tempo.value;
+            const pontuacao = respostaForm.pontuacao.value;
+            try {
+                const resp = await fetch(`${API_URL}/responder`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        ra: raAtual,
+                        atividadeId,
+                        respostas,
+                        tempo,
+                        pontuacao
+                    })
+                });
+                const data = await resp.json();
+                if (data.ok) {
+                    mostrarMsg(data.mensagem, true);
+                } else {
+                    mostrarMsg("Erro ao enviar respostas.");
+                }
+            } catch (err) {
+                mostrarMsg("Erro de conexão.");
+            }
+        });
+
+        // VER PROGRESSO
+        btnProgresso.addEventListener('click', async function() {
+            limparMsg();
+            progressoDiv.innerHTML = "Buscando...";
+            try {
+                const resp = await fetch(`${API_URL}/progresso`, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ra: raAtual})
+                });
+                const lista = await resp.json();
+                if (lista.length === 0) {
+                    progressoDiv.innerHTML = "<em>Nenhum progresso registrado.</em>";
+                    return;
+                }
+                progressoDiv.innerHTML = "";
+                lista.forEach(p => {
+                    progressoDiv.innerHTML += `
+                        <div><b>ID:</b> ${p.atividadeId} | <b>Status:</b> ${p.status} | <b>Tempo:</b> ${p.tempo} min | <b>Pontuação:</b> ${p.pontuacao}%</div>
+                    `;
+                });
+            } catch (err) {
+                progressoDiv.innerHTML = "Erro ao buscar progresso.";
+            }
+        });
+    </script>
 </body>
 </html>
